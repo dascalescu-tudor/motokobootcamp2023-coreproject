@@ -6,6 +6,9 @@ import Nat "mo:base/Nat";
 import Hash "mo:base/Hash";
 import Principal "mo:base/Principal";
 import List "mo:base/List";
+import DaoLedger "canister:dao-ledger";
+import Webpage "canister:webpage";
+
 
 actor Dao{
 
@@ -44,8 +47,6 @@ actor Dao{
     };
 
     stable var proposalCurrentID : Nat = 0;
-
-    // Create, Read, Update, Delete
 
     public shared ({caller}) func create_proposal(motion : Text) : async {#ok : Text; #error : Text}{
         if(Principal.isAnonymous(caller))
@@ -128,44 +129,57 @@ actor Dao{
         {
             return #error("You must login with your identity");
         } else {
-            let wantedProposal : ?Proposal = proposals.get(id);
-            switch(wantedProposal){
-                case null {
-                    return #error("Proposal with id: " # Nat.toText(id) # " does not exist");
-                };
-                case(?found){
 
-                    let findVoter : ?Principal = List.find<Principal>(found.voters, func x = if(Principal.equal(x, caller)){true} else {false}); 
+            let callerDeposit = await DaoLedger.get_balance(?caller);
 
-                    switch(findVoter){
-                        case(null){
-                            let newVotersList = List.push<Principal>(caller, found.voters);
-                            let updatedProposal = {
-                                id = found.id;
-                                creator = found.creator;
-                                motion = found.motion;
-                                downVotes = found.downVotes;
-                                upVotes = found.upVotes + 1;
-                                status = found.status;
-                                voters = newVotersList;
-                            };
-                            let result = proposals.replace(id, updatedProposal);
-                            switch(result){
-                                case null {
-                                    return #error("Proposal does not exist");
+            if(callerDeposit == 0){
+                return #error("You have to deposit mbt in order to vote");
+            } else {
+                let wantedProposal : ?Proposal = proposals.get(id);
+                switch(wantedProposal){
+                    case null {
+                        return #error("Proposal with id: " # Nat.toText(id) # " does not exist");
+                    };
+                    case(?found){
+
+                        let findVoter : ?Principal = List.find<Principal>(found.voters, func x = if(Principal.equal(x, caller)){true} else {false}); 
+
+                        switch(findVoter){
+                            case(null){
+                                let newVotersList = List.push<Principal>(caller, found.voters);
+                                var newProposalState : Status = found.status;
+
+                                if(found.upVotes + callerDeposit >= 100){
+                                    newProposalState := #Accepted;
+                                    Webpage.set_proposal_state("Accepted");
                                 };
-                                case(?allGood){
-                                    return #ok("Thanks for your vote.");
+                                let updatedProposal = {
+                                    id = found.id;
+                                    creator = found.creator;
+                                    motion = found.motion;
+                                    downVotes = found.downVotes;
+                                    upVotes = found.upVotes + callerDeposit;
+                                    status = newProposalState;
+                                    voters = newVotersList;
                                 };
+                                let result = proposals.replace(id, updatedProposal);
+                                switch(result){
+                                    case null {
+                                        return #error("Proposal does not exist");
+                                    };
+                                    case(?allGood){
+                                        return #ok("Thanks for your vote.");
+                                    };
+                                };
+                            }; 
+                            case(?alreadyVoted){
+                                return #error("You are not allowed to vote twice");
                             };
-                        }; 
-                        case(?alreadyVoted){
-                            return #error("You are not allowed to vote twice");
                         };
                     };
                 };
             };
-        }
+        };
     };
 
     public shared ({caller}) func down_vote(id : Nat) : async {#ok : Text; #error : Text}{
@@ -173,44 +187,58 @@ actor Dao{
         {
             return #error("You must login with your identity");
         } else {
-            let wantedProposal : ?Proposal = proposals.get(id);
-            switch(wantedProposal){
-                case null {
-                    return #error("Proposal with id: " # Nat.toText(id) # " does not exist");
-                };
-                case(?found){
 
-                    let findVoter : ?Principal = List.find<Principal>(found.voters, func x = if(Principal.equal(x, caller)){true} else {false}); 
+            let callerDeposit = await DaoLedger.get_balance(?caller);
 
-                    switch(findVoter){
-                        case(null){
-                            let newVotersList = List.push<Principal>(caller, found.voters);
-                            let updatedProposal = {
-                                id = found.id;
-                                creator = found.creator;
-                                motion = found.motion;
-                                downVotes = found.downVotes;
-                                upVotes = found.upVotes + 1;
-                                status = found.status;
-                                voters = newVotersList;
-                            };
-                            let result = proposals.replace(id, updatedProposal);
-                            switch(result){
-                                case null {
-                                    return #error("Proposal does not exist");
+            if(callerDeposit == 0){
+                return #error("You have to deposit mbt in order to vote");
+            } else {
+                let wantedProposal : ?Proposal = proposals.get(id);
+                switch(wantedProposal){
+                    case null {
+                        return #error("Proposal with id: " # Nat.toText(id) # " does not exist");
+                    };
+                    case(?found){
+
+                        let findVoter : ?Principal = List.find<Principal>(found.voters, func x = if(Principal.equal(x, caller)){true} else {false}); 
+
+                        switch(findVoter){
+                            case(null){
+                                let newVotersList = List.push<Principal>(caller, found.voters);
+                                var newProposalState : Status = found.status;
+
+                                if(found.downVotes + callerDeposit >= 100){
+                                    newProposalState := #Rejected;
+                                    Webpage.set_proposal_state("Accepted");
                                 };
-                                case(?allGood){
-                                    return #ok("Thanks for your vote.");
+
+                                let updatedProposal = {
+                                    id = found.id;
+                                    creator = found.creator;
+                                    motion = found.motion;
+                                    downVotes = found.downVotes;
+                                    upVotes = found.upVotes + callerDeposit;
+                                    status = newProposalState;
+                                    voters = newVotersList;
                                 };
+                                let result = proposals.replace(id, updatedProposal);
+                                switch(result){
+                                    case null {
+                                        return #error("Proposal does not exist");
+                                    };
+                                    case(?allGood){
+                                        return #ok("Thanks for your vote.");
+                                    };
+                                };
+                            }; 
+                            case(?alreadyVoted){
+                                return #error("You are not allowed to vote twice");
                             };
-                        }; 
-                        case(?alreadyVoted){
-                            return #error("You are not allowed to vote twice");
                         };
                     };
                 };
             };
-        }
+        };
     };
 
     public shared ({caller}) func delete_proposal(id : Nat) : async {#ok : Text; #error : Text}{
