@@ -1,56 +1,63 @@
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+      "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #424242;
-}
-
-button {
+  }
+  
+  button {
     font-weight: 600;
-}
-
-.slogan {
+  }
+  
+  .slogan {
     font-size: 1.7em;
     margin-bottom: 0;
-}
-
-.twitter {
+  }
+  
+  .twitter {
     font-size: 0.4em;
-}
-
-.App-logo {
+  }
+  
+  .App-logo {
     height: 14vmin;
     pointer-events: none;
     transform: scale(1);
     animation: pulse 3s infinite;
-}
-
-.App-header {
+  }
+  
+  .App-header {
     height: calc(100vh - 70px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     font-size: calc(10px + 2vmin);
-}
-
-.examples {
+  }
+  
+  .examples {
     padding: 30px 100px;
-    display: grid;
+    /* display: grid;
     grid-gap: 30px;
-    grid-template-columns: 1fr 1fr 1fr;
-}
-
-.examples-title {
+    grid-template-columns: 1fr 1fr 1fr; */
+  }
+  .danger-text { 
+      color: lightcoral;
+      font-weight: 600;
+  }
+  .succes-text {
+      color: lightgreen;
+      font-weight: 600;
+  }
+  .examples-title {
     font-size: 1.3em;
     margin-bottom: 0;
     text-align: center;
-}
-
-.example {
+  }
+  
+  .example {
     padding: 50px 50px;
     min-height: 300px;
     display: flex;
@@ -60,14 +67,14 @@ button {
     /*border: 1px solid black;*/
     /*background: #f4f4f4;*/
     border-radius: 15px;
-}
-
-.example-disabled {
+  }
+  
+  .example-disabled {
     font-size: 1.3em;
     color: #9e9e9e;
-}
-
-.demo-button {
+  }
+  
+  .demo-button {
     background: #a02480;
     padding: 0 1.3em;
     margin-top: 1em;
@@ -78,14 +85,18 @@ button {
     border: 0;
     cursor: pointer;
     color: white;
-}
-
-.demo-button:active {
+  }
+  
+  .demo-button:active {
     color: white;
     background: #979799;
-}
-
-.auth-section {
+  }
+  
+  .connect-button {
+    margin-top: 0.5em;
+  }
+  
+  .auth-section {
     padding: 1em;
     display: flex;
     justify-content: flex-end;
@@ -94,21 +105,34 @@ button {
     position: fixed;
     top: 0;
     right: 0;
-}
-
-@keyframes pulse {
+  }
+  ul {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+  }
+  li {
+    border: 5px solid saddlebrown;
+    padding: 0.75em;
+  }
+  .delete-btn {
+    background-color: lightcoral;
+  }
+  
+  @keyframes pulse {
     0% {
-        transform: scale(0.97);
-        opacity: 0;
+      transform: scale(0.97);
+      opacity: 0;
     }
-
+  
     70% {
-        transform: scale(1);
-        opacity: 1;
+      transform: scale(1);
+      opacity: 1;
     }
-
+  
     100% {
-        transform: scale(0.97);
-        opacity: 0;
+      transform: scale(0.97);
+      opacity: 0;
     }
-}
+  }
+  

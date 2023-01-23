@@ -11,7 +11,7 @@ actor Webpage{
 
     public shared ({caller}) func set_proposal_state(state: Text) : () {
         
-        assert caller == Principal.fromText("qoctq-giaaa-aaaaa-aaaea-cai");
+        assert caller == Principal.fromText("wfkpq-7iaaa-aaaan-qc3ba-cai");
         proposalState := state;
     };
 

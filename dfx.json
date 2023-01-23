@@ -5,10 +5,7 @@
       "type": "motoko",
       "dependencies": ["webpage"]
     },
-    "dao-ledger": {
-      "main": "bbdao/dao-ledger.mo",
-      "type": "motoko"
-    },
+    
     "assets": {
       "dependencies": ["bbdao"],
       "interface": {
